@@ -1,5 +1,9 @@
 
 
+在运行shell脚本时，添加 -x 可以显示脚本的执行过程，例如：sh -x hello.sh
+
+
+
 # 一、shell中变量的高级使用
 
 ![image-20201108163048388](/picture/image-20201108163048388.png)
@@ -12,7 +16,7 @@
 
 &emsp;&emsp;Linux shell中的函数和大多数编程语言中的函数是一样的，将相似的任务或代码封装到函数中，供其他地方调用。
 
-函数的定义格式：
+## 1、函数的定义格式
 
 ```shell
 name() {
@@ -29,7 +33,9 @@ function name {
 }
 ```
 
-如何调用函数：
+<br/>
+
+## 2、如何调用函数
 
 &emsp;&emsp;直接使用函数名调用，可以将其想象成shell中的一条命令，函数内部可以直接使用参数：$1、$2...$n。
 
@@ -59,6 +65,114 @@ do
     sleep 5
 done
 ```
+
+<br/>
+
+## 3、如何向函数传递参数
+
+```shell
+# 如何向函数中传递参数  --> 函数签名中无需指定参数，函数中只需要直接使用即可（$1, $2, .... 按顺序获取）
+function calculate {
+    case $2 in
+        +)
+            echo "`expr $1 + $3`"
+            ;;  # ;; 是case的终结符
+        -)
+            echo "`expr $1 - $3`"
+            ;;
+        \*)
+            # *代表匹配所有，所以这里需要转义
+            echo "`expr $1 \* $3`"
+            ;;
+        /)
+            echo "`expr $1 / $3`"
+            ;;
+        *)
+            echo "unSupport other calculate!"
+            ;;
+    esac
+}
+
+# 调用函数的时候，直接将需要传递的参数跟在函数名后面用空格分隔
+calculate 20 + 30
+#calculate 20 * 30
+calculate 200 / 30
+```
+
+**shell中的特殊变量**
+
+| $0        | 当前脚本的文件名。                                           |
+| --------- | ------------------------------------------------------------ |
+| $n（n≥1） | 传递给脚本或函数的参数。n 是一个数字，表示第几个参数。例如，第一个参数是 $1，第二个参数是 $2。 |
+| $#        | 传递给脚本或函数的参数个数。                                 |
+| $*        | 传递给脚本或函数的所有参数。                                 |
+| $@        | 传递给脚本或函数的所有参数。当被双引号`" "`包含时，$@ 与 $* 稍有不同 |
+| $?        | 上个命令的退出状态，或函数的返回值，一般情况下，大部分命令执行成功会返回 0，失败返回 1 |
+| $$        | 当前 Shell 进程 ID。对于 Shell 脚本，就是这些脚本所在的进程 ID。 |
+
+<br/>
+
+## 4、函数的返回值
+
+&emsp;&emsp;1、return：使用return返回值，只能返回1-255的整数。函数使用return返回值，通常只是用来供其他地方调用获取状态，因此通常仅返回0或者1；0：表示成功，1：表示失败。
+
+&emsp;&emsp;2、echo：使用echo可以返回任何字符串结果，通常用于返回数据，比如一个字符串值或者列表值。
+
+```shell
+# 获取系统的用户列表，并返回
+function users() {
+    user_list = `cat /etc/passwd | cut -d: -f1`
+    echo $user_list
+}
+```
+
+<br/>
+
+## 5、函数的局部变量
+
+&emsp;&emsp;shell函数中不做特殊声明，shell中的变量都是全局变量，在大型脚本程序中函数应该慎用全局变量。
+
+&emsp;&emsp;定义局部变量，使用local关键字，该变量的作用域只存在于函数内部。如果函数内和函数外存在同名变量，则函数内部变量覆盖外部变量。
+
+```shell
+global_var_1="Hello World"
+
+function local_var_test() {
+    global_var_2=100
+    local local_var_1=200
+}
+
+# 调用函数之前 var_global_2 是为空的
+echo $global_var_1
+echo $global_var_2
+echo $local_var_1
+
+local_var_test
+
+# 调用函数之后 var_global_2 会变成一个全局变量, local_var_1 是 函数local_var_test的局部变量，在其他地方都无法使用
+echo $global_var_1
+echo $global_var_2
+echo $local_var_1
+
+function global_var_test() {
+    echo $global_var_2
+}
+global_var_test
+```
+
+<br/>
+
+## 6、库函数
+
+&emsp;&emsp;可以定义一些库函数，供其他shell脚本调用执行。经验之谈：
+
+&emsp;&emsp;1、库文件名的后缀名是任意的，但一般使用.lib；
+
+&emsp;&emsp;2、库文件通常没有可执行选项；
+
+&emsp;&emsp;3、库文件无需和脚本在同级目录，只需在脚本引用（直接写入库文件路径即可，或者 source filename）时指定；
+
+&emsp;&emsp;4、第一行一般使用#!/bin/echo，输出警告信息，避免用户执行。
 
 <br/>
 
