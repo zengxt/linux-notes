@@ -337,3 +337,91 @@ grep参数，选项：
 -x：匹配整行
 
 -l：只列出匹配的文件名，不显示具体匹配行内容
+
+<br/>
+
+
+
+# 五、文本处理三剑客之sed
+
+第一种形式：stdout | sed [option] "pattern command"
+
+第二种形式：sed [option] "pattern command" file
+
+## 1、sed的选项
+
+-n 只打印模式匹配行
+
+```shell
+echo "sed 的 p 命令打印"
+sed 'p' sed_file.txt  # 每行会输出两遍（原数据行 和 当前匹配到的行）
+echo "################"
+
+echo "-n 选项  只打印模式匹配行"
+sed -n 'p' sed_file.txt
+echo "################"
+
+# 匹配模式固定写法 // 在两个斜杠之间，可以使用正则表达式，前面的两句只有命令p，没有匹配模式，会对文件中的每一行依次处理
+sed -n '/python/p' sed_file.txt
+echo "################"
+```
+
+-e：直接在命令行进行sed编辑，默认选项
+
+```shell
+echo "-e：直接在命令行进行sed编辑，默认选项"
+sed -n -e '/python/p' -e '/PYTHON/p' sed_file.txt
+echo "################"
+```
+
+-f：编辑动作保存在文件中，指定文件执行
+
+```shell
+echo "-f：编辑动作保存在文件中，指定文件执行"
+sed -n -f edit.sed sed_file.txt
+echo "################"
+```
+
+-r：支持扩展正则表达式
+
+```shell
+echo "-r：支持扩展正则表达式"
+sed -n -r '/python|PYTHON/p' sed_file.txt
+echo "################"
+```
+
+-i：直接修改文件内容
+
+```shell
+echo "-i：直接修改文件内容"
+sed -n 's/love/like/g;p' sed_file.txt  # 这里文件没有被修改，只是将替换后的结果从命令行输出
+sed -i 's/love/like/g' sed_file.txt # 实际修改了文件
+echo "################"
+```
+
+<br/>
+
+## 2、sed中的pattern详解
+
+10command：匹配到第10行
+
+10,20command：匹配从第10行开始，到第20行结束
+
+10,+5command：匹配从第10行开始，到第16行结束
+
+/pattern1/command：匹配到pattern1的行
+
+/pattern1,/pattern2/command：匹配到pattern1的行开始，到匹配到pattern2的行结束
+
+10,/pattern1/command：从第10行开始，到匹配到pattern1的行结束
+
+/pattern1,10command：匹配到pattern1的行开始，到第10行结束
+
+
+
+
+
+
+
+
+
