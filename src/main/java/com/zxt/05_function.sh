@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 
+# function 关键字可省略
 test() {
     echo "test function"
 }
+
+test
+
 
 function greeting {
     echo "hello $1"
 }
 
-test
-
 greeting zhangsan
+echo $?  # $? 显示最后命令的退出状态，0表示没有错误。如果函数中最后使用了 return，那么 $? 是函数的返回值
 
 
 # 一个简单的守护函数
@@ -33,6 +36,7 @@ function nginx_daemon() {
 #    nginx_daemon
 #    sleep 5
 #done
+
 
 # 如何向函数中传递参数  --> 函数签名中无需指定参数，函数中只需要直接使用即可（$1, $2, .... 按顺序获取）
 function calculate {
@@ -58,14 +62,15 @@ function calculate {
 
 # 调用函数的时候，直接将需要传递的参数跟在函数名后面用空格分隔
 calculate 20 + 30
-#calculate 20 * 30
+# calculate 20 * 30
 calculate 200 / 30
 
 
 # 获取系统的用户列表，并返回
 function users() {
     user_list = `cat /etc/passwd | cut -d: -f1`
-    echo $user_list
+    echo ${user_list}
 }
 
-sh local_var_demo.sh
+
+sh "D:\Java Notes\linux-notes\src\main\java\com\zxt\local_var_demo.sh"
